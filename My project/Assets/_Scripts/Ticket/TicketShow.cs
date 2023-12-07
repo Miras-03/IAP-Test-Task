@@ -15,6 +15,8 @@ namespace Ticket
             this.ticket = ticket;
         }
 
-        public void Initialize() => ticketIndicator.text = ticket.CurrentTicket.ToString();
+        public void Initialize() => UpdateText();
+
+        public void UpdateText() => ticketIndicator.text = ticket.CurrentTicket.ToString();
     }
 }

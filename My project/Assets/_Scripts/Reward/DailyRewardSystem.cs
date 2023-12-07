@@ -65,7 +65,7 @@ namespace RewardSpace
             DateTime lastLoginDate = GetLastLoginDate();
             DateTime currentDate = DateTime.Now;
 
-            int daysPassed = (int)(currentDate - lastLoginDate).TotalDays;
+            int daysPassed = 4;//(int)(currentDate - lastLoginDate).TotalDays;
 
             if (daysPassed >= maxDays)
                 ResetDailyRewards();
