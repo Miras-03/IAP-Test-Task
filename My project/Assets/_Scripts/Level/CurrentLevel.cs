@@ -1,26 +1,41 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Level
 {
-    public sealed class CurrentLevel
+    public sealed class CurrentLevel : IInitializable
     {
-        private Button[] levels;
+        private Button[] levelButtons;
 
-        public CurrentLevel(Button[] levels) => this.levels = levels;
+        private const int levelCount = 19;
+        private const string LevelEnabled = nameof(LevelEnabled);
 
-        private void EnableLevels()
+        [Inject]
+        public void Constructor(Button[] levelButtons) => this.levelButtons = levelButtons;
+
+        public void Initialize()
         {
-            bool levelEnabled = PlayerPrefs.GetInt("LevelEnabled", 0) != 0;
+            DisableLevels();
+            EnableLevels();
+        }
 
-            foreach (Button level in levels)
-                level.interactable = levelEnabled;
+        public void EnableLevels()
+        {
+            bool levelEnabled;
+            for (int i = 0; i < levelCount; i++)
+            {
+                levelEnabled = PlayerPrefs.GetInt(LevelEnabled + i, 0) != 0;
+                levelButtons[i].interactable = levelEnabled;
+            }
+            levelButtons[0].interactable = true;
         }
 
         private void DisableLevels()
         {
-            foreach (Button level in levels) 
-                level.interactable = false;
+
+            for (int i = 0; i < levelCount; i++)
+                levelButtons[i].interactable = false;
         }
     }
 }
