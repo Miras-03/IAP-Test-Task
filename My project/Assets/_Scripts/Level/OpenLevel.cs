@@ -1,21 +1,28 @@
+using TicketSpace;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace Level
+namespace LevelSpace
 {
     public sealed class OpenLevel : IInitializable
     {
-        private Level currentLevel;
+        private Level level;
+        private Ticket ticket;
+        private TicketShow ticketShow;
+
         private Button[] buttons;
         private AudioSource clickSound;
 
-        private const string LevelEnabled = nameof(LevelEnabled);
+        private const string LevelEnabled_ = nameof(LevelEnabled_);
+        private const string CurrentLevel = nameof(CurrentLevel);
 
         [Inject]
-        public void Constructor(Level currentLevel, Button[] buttons, AudioSource[] audious)
-        {
-            this.currentLevel = currentLevel;
+        public void Constructor(Level level, Ticket ticket, TicketShow ticketShow, 
+            Button[] buttons, AudioSource[] audious) {
+            this.level = level;
+            this.ticket = ticket;
+            this.ticketShow = ticketShow;
             this.buttons = buttons;
             clickSound = audious[0];
         }
@@ -34,8 +41,18 @@ namespace Level
 
         private void OpenNextLevel(int nextLevel)
         {
-            PlayerPrefs.SetInt(LevelEnabled+nextLevel, 1);
-            currentLevel.EnableLevels();
+            PlayerPrefs.SetInt(LevelEnabled_+nextLevel, 1); 
+            PlayerPrefs.SetInt(CurrentLevel, nextLevel);
+            PlayerPrefs.Save();
+
+            level.EnableLevels();
+            UpgradeTicket();
+        }
+
+        private void UpgradeTicket()
+        {
+            ticket.CurrentTicket += 50;
+            ticketShow.UpdateText();
         }
     }
 }

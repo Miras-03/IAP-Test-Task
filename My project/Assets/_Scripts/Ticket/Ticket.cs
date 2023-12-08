@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Ticket
+namespace TicketSpace
 {
     public sealed class Ticket
     {
@@ -9,7 +9,13 @@ namespace Ticket
         public int CurrentTicket
         {
             get => PlayerPrefs.GetInt(TicketCount, 0);
-            set => PlayerPrefs.SetInt(TicketCount, value);
+            set
+            {
+                if (PlayerPrefs.GetInt(TicketCount, 0) + value >= 0)
+                    PlayerPrefs.SetInt(TicketCount, value);
+                else
+                    PlayerPrefs.SetInt(TicketCount, 0);
+            }
         }
     }
 }

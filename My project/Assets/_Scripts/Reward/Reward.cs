@@ -1,4 +1,4 @@
-using Ticket;
+using TicketSpace;
 using UnityEngine;
 using Zenject;
 
@@ -6,12 +6,12 @@ namespace RewardSpace
 {
     public sealed class Reward
     {
-        private Ticket.Ticket ticket;
+        private TicketSpace.Ticket ticket;
         private TicketShow ticketShow;
         private const string TakenReward_ = nameof(TakenReward_);
 
         [Inject]
-        public void Constructor(Ticket.Ticket ticket, TicketShow ticketShow)
+        public void Constructor(TicketSpace.Ticket ticket, TicketShow ticketShow)
         {
             this.ticket = ticket;
             this.ticketShow = ticketShow;

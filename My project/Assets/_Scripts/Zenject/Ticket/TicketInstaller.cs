@@ -1,6 +1,6 @@
 using Zenject;
 
-namespace Ticket
+namespace TicketSpace
 {
     public sealed class TicketInstaller : MonoInstaller
     {

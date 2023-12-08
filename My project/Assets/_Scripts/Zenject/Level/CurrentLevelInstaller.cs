@@ -1,6 +1,6 @@
 using Zenject;
 
-namespace Level
+namespace LevelSpace
 {
     public class CurrentLevelInstaller : MonoInstaller
     {
