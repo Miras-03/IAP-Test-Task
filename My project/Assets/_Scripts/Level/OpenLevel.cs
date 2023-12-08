@@ -6,16 +6,18 @@ namespace Level
 {
     public sealed class OpenLevel : IInitializable
     {
-        private CurrentLevel currentLevel;
+        private Level currentLevel;
         private Button[] buttons;
+        private AudioSource clickSound;
 
         private const string LevelEnabled = nameof(LevelEnabled);
 
         [Inject]
-        public void Constructor(CurrentLevel currentLevel, Button[] buttons)
+        public void Constructor(Level currentLevel, Button[] buttons, AudioSource[] audious)
         {
             this.currentLevel = currentLevel;
             this.buttons = buttons;
+            clickSound = audious[0];
         }
 
         public void Initialize() => AddButtonListeners();
@@ -26,6 +28,7 @@ namespace Level
             {
                 int nextLevel = i + 1;
                 buttons[i].onClick.AddListener(() => OpenNextLevel(nextLevel));
+                buttons[i].onClick.AddListener(clickSound.Play);
             }
         }
 

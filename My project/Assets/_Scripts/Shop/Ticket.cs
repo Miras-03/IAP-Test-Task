@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Shop
+namespace Ticket
 {
     public sealed class Ticket
     {

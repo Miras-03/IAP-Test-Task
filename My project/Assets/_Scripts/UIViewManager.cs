@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace UISpace
 {
@@ -19,6 +20,11 @@ namespace UISpace
         [Header("ViewPanels")]
         [SerializeField] private GameObject[] panels;
 
+        private AudioSource clickSound;
+
+        [Inject] 
+        public void Constructor(AudioSource[] audious) => clickSound = audious[0];
+
         private void Start()
         {
             CloseAndOpenMainView();
@@ -29,15 +35,25 @@ namespace UISpace
         private void AddButtonListeners()
         {
             play.onClick.AddListener(OpenLevelView);
+            play.onClick.AddListener(clickSound.Play);
+
             setting.onClick.AddListener(OpenSettingView);
+            setting.onClick.AddListener(clickSound.Play);
+
             reward.onClick.AddListener(OpenRewardView);
+            reward.onClick.AddListener(clickSound.Play);
+
             shop.onClick.AddListener(OpenShopView);
+            shop.onClick.AddListener(clickSound.Play);
         }
 
         private void AddHomeButtonListeners()
         {
             foreach (Button button in homeButtons)
+            {
                 button.onClick.AddListener(CloseAndOpenMainView);
+                button.onClick.AddListener(clickSound.Play);
+            }
         }
 
         private void OpenMainView() => panels[0].SetActive(true);

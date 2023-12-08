@@ -1,7 +1,7 @@
 using TMPro;
 using Zenject;
 
-namespace Shop
+namespace Ticket
 {
     public sealed class TicketShow : IInitializable
     {
