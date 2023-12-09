@@ -1,6 +1,5 @@
 using TMPro;
 using UnityEngine;
-using Zenject;
 
 namespace RewardSpace
 {
@@ -10,15 +9,17 @@ namespace RewardSpace
         [SerializeField] private TextMeshProUGUI rewardAmount;
         private Reward reward;
 
-        [HideInInspector] public int amount;
-
-        [Inject]
-        public void Construct(Reward reward) => this.reward = reward;
+        public SundayReward(Reward reward, GameObject sundayPanel, TextMeshProUGUI rewardAmount)
+        {
+            this.reward = reward;
+            this.sundayPanel = sundayPanel;
+            this.rewardAmount = rewardAmount;
+        }
 
         public void Reward()
         {
             sundayPanel.SetActive(true);
-            rewardAmount.text = reward.RewardAmount.ToString();
+            rewardAmount.text = $"{reward.RewardAmount}x";
         }
     }
 }

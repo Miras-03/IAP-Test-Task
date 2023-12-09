@@ -9,7 +9,7 @@ namespace RewardSpace
     public sealed class DailyRewardSystem : MonoBehaviour
     {
         [Space(10)]
-        [SerializeField] private SundayReward sundayReward;
+        private SundayReward sundayReward;
         private DailyProgressIndicator progressIndicator;
         private Reward reward;
         private LoginDate loginDate;
@@ -20,12 +20,27 @@ namespace RewardSpace
         [SerializeField] private AudioSource clickSound;
 
         [Space(20)]
-        [Header("UI")]
+        [Header("Button")]
         [SerializeField] private Button rewardButton;
         [SerializeField] private Button[] dayButtons;
+
+        [Space(20)]
+        [Header("Image")]
+        [SerializeField] private Image previousPoint;
         [SerializeField] private Image[] checkmarkImages;
-        [SerializeField] private Slider progressBar;
+
+        [Space(20)]
+        [Header("TMP")]
         [SerializeField] private TextMeshProUGUI dayIndicator;
+        [SerializeField] private TextMeshProUGUI rewardAmount;
+
+        [Space(10)]
+        [Header("Slider")]
+        [SerializeField] private Slider progressBar;
+
+        [Space(10)]
+        [Header("Panel")]
+        [SerializeField] private GameObject sundayPanel;
 
         private int daysPassed = 0;
         private const int maxDays = 6;
@@ -36,7 +51,8 @@ namespace RewardSpace
         {
             this.reward = reward;
             loginDate = new LoginDate();
-            progressIndicator = new DailyProgressIndicator(progressBar, dayIndicator);
+            progressIndicator = new DailyProgressIndicator(reward, progressBar, dayIndicator);
+            sundayReward = new SundayReward(reward, sundayPanel, rewardAmount);
             rewardUI = new RewardUI(dayButtons, checkmarkImages, reward);
         }
 
@@ -76,23 +92,23 @@ namespace RewardSpace
             DateTime currentDate = DateTime.Now;
 
             DisableButtons();
-            daysPassed = 2;
+            daysPassed = (int)(currentDate-lastLoginDate).TotalDays;
             IndicateProgress();
+
             CheckOrExecuteSunday();
             UpdateButtons(daysPassed);
         }
 
-        private void IndicateProgress()
-        {
-            int rewardCount = reward.GetTakenRewardCount();
-            progressIndicator.Indicate(rewardCount);
-        }
+        private void IndicateProgress() => progressIndicator.Indicate(daysPassed);
 
         private void CheckOrExecuteSunday()
         {
+            previousPoint.color = Color.gray;
             if (daysPassed >= maxDays)
             {
+                previousPoint.color = Color.green;
                 ExecuteSundayReward();
+                reward.SetRewardCount(maxDays);
                 daysPassed = 0;
             }
         }

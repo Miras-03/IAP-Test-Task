@@ -5,11 +5,13 @@ namespace RewardSpace
 {
     public class DailyProgressIndicator
     {
+        private Reward reward;
         private Slider progressBar;
         private TextMeshProUGUI dayCount;
 
-        public DailyProgressIndicator(Slider progressBar, TextMeshProUGUI dayCount)
+        public DailyProgressIndicator(Reward reward, Slider progressBar, TextMeshProUGUI dayCount)
         {
+            this.reward = reward;
             this.progressBar = progressBar;
             this.dayCount = dayCount;
         }

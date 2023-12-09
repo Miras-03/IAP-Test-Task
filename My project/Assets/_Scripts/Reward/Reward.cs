@@ -24,10 +24,13 @@ namespace RewardSpace
         public void TakeReward(int day)
         {
             Take(day);
-            PlayerPrefs.SetInt(rewardCount, day);
+            CheckAndSetRewardCount(day);
+
             PlayerPrefs.SetInt(GetTakenRewardKey(day), 1);
             PlayerPrefs.Save();
         }
+
+        private void CheckAndSetRewardCount(int day) => PlayerPrefs.SetInt(rewardCount, day);
 
         public string GetTakenRewardKey(int day) => TakenReward_ + day.ToString();
 
@@ -63,12 +66,12 @@ namespace RewardSpace
             ticketShow.UpdateText();
         }
 
-        public int GetTakenRewardCount() => PlayerPrefs.GetInt(rewardCount);
+        public int GetTakenRewardCount() => PlayerPrefs.GetInt(rewardCount, 0);
 
         public void SetRewardCount(int takenDay)
         {
             int currentTakenReward = GetTakenRewardCount();
-            if (takenDay>currentTakenReward)
+            if (takenDay>currentTakenReward || takenDay == 0)
                 PlayerPrefs.SetInt(rewardCount, takenDay);
         }
 
