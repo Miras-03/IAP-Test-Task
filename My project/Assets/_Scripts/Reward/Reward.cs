@@ -6,52 +6,72 @@ namespace RewardSpace
 {
     public sealed class Reward
     {
-        private TicketSpace.Ticket ticket;
+        private Ticket ticket;
         private TicketShow ticketShow;
+
+        private int rewardAmount;
+        private int[] rewards = { 500, 1000, 1500 };
         private const string TakenReward_ = nameof(TakenReward_);
+        private const string rewardCount = "TakenRewardCount";
 
         [Inject]
-        public void Constructor(TicketSpace.Ticket ticket, TicketShow ticketShow)
+        public void Constructor(Ticket ticket, TicketShow ticketShow)
         {
             this.ticket = ticket;
             this.ticketShow = ticketShow;
         }
-    
-        public string GetTakenRewardKey(int day) => TakenReward_ + day.ToString();
 
         public void TakeReward(int day)
         {
             Take(day);
+            PlayerPrefs.SetInt(rewardCount, day);
             PlayerPrefs.SetInt(GetTakenRewardKey(day), 1);
             PlayerPrefs.Save();
         }
+
+        public string GetTakenRewardKey(int day) => TakenReward_ + day.ToString();
 
         private void Take(int day)
         {
             switch (day)
             {
                 case 0:
-                    ticket.CurrentTicket += 500;
+                    rewardAmount = 500;
                     break;
                 case 1:
-                    ticket.CurrentTicket += 500;
+                    rewardAmount = 500;
                     break;
                 case 2:
-                    ticket.CurrentTicket += 1000;
+                    rewardAmount = 1000;
                     break;
                 case 3:
-                    ticket.CurrentTicket += 1000;
+                    rewardAmount = 1000;
                     break;
                 case 4:
-                    ticket.CurrentTicket += 1500;
+                    rewardAmount = 1500;
                     break;
                 case 5:
-                    ticket.CurrentTicket += 1500;
+                    rewardAmount = 1500;
+                    break;
+                case 6:
+                    rewardAmount = rewards[Random.Range(0,3)]/100;
                     break;
                 default:
                     throw new System.ArgumentOutOfRangeException();
             }
+            ticket.CurrentTicket += rewardAmount;
             ticketShow.UpdateText();
         }
+
+        public int GetTakenRewardCount() => PlayerPrefs.GetInt(rewardCount);
+
+        public void SetRewardCount(int takenDay)
+        {
+            int currentTakenReward = GetTakenRewardCount();
+            if (takenDay>currentTakenReward)
+                PlayerPrefs.SetInt(rewardCount, takenDay);
+        }
+
+        public int RewardAmount => rewardAmount;
     }
 }

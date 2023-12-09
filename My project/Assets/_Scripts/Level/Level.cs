@@ -37,5 +37,15 @@ namespace LevelSpace
             for (int i = 0; i < levelCount; i++)
                 levelButtons[i].interactable = false;
         }
+
+        public int CurrentLevel
+        {
+            get => PlayerPrefs.GetInt("CurrentLevel", 0);
+            set
+            {
+                if (value > CurrentLevel)
+                    PlayerPrefs.SetInt("CurrentLevel", value);
+            }
+        }
     }
 }

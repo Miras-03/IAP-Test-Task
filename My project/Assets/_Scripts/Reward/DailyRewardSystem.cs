@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -7,22 +8,36 @@ namespace RewardSpace
 {
     public sealed class DailyRewardSystem : MonoBehaviour
     {
-        public Button[] dayButtons;
-        public Image[] checkmarkImages;
-
+        [Space(10)]
+        [SerializeField] private SundayReward sundayReward;
+        private DailyProgressIndicator progressIndicator;
         private Reward reward;
+        private LoginDate loginDate;
+        private RewardUI rewardUI;
 
-        private const int maxDays = 7;
-        private const string LastLoginDate = nameof(LastLoginDate);
+        [Space(20)]
+        [Header("Audio")]
+        [SerializeField] private AudioSource clickSound;
+
+        [Space(20)]
+        [Header("UI")]
+        [SerializeField] private Button rewardButton;
+        [SerializeField] private Button[] dayButtons;
+        [SerializeField] private Image[] checkmarkImages;
+        [SerializeField] private Slider progressBar;
+        [SerializeField] private TextMeshProUGUI dayIndicator;
+
+        private int daysPassed = 0;
+        private const int maxDays = 6;
         private const string TakenReward_ = nameof(TakenReward_);
 
         [Inject]
-        public void Construct(Reward reward) => this.reward = reward;
-
-        private void Start()
+        public void Construct(Reward reward)
         {
-            ResetDailyRewards();
-            UpdateDailyRewards();
+            this.reward = reward;
+            loginDate = new LoginDate();
+            progressIndicator = new DailyProgressIndicator(progressBar, dayIndicator);
+            rewardUI = new RewardUI(dayButtons, checkmarkImages, reward);
         }
 
         private void OnEnable() => AddButtonListeners();
@@ -31,7 +46,8 @@ namespace RewardSpace
 
         private void AddButtonListeners()
         {
-            for (int i = 0; i < maxDays-1; i++)
+            rewardButton.onClick.AddListener(UpdateDailyRewards);
+            for (int i = 0; i < maxDays; i++)
             {
                 int day = i;
                 dayButtons[i].onClick.AddListener(() => TakeReward(day));
@@ -40,64 +56,61 @@ namespace RewardSpace
 
         private void RemoveButtonListeners()
         {
+            rewardButton.onClick.RemoveAllListeners();
             foreach (Button button in dayButtons)   
                 button.onClick.RemoveAllListeners();
         }
 
         private void TakeReward(int day)
         {
+            clickSound.Play();
             reward.TakeReward(day);
-            dayButtons[day].interactable = false;
-            checkmarkImages[day].enabled = true;
-        }
-
-        private void ResetDailyRewards()
-        {
-            for (int i = 0; i < maxDays - 1; i++)
-            {
-                dayButtons[i].interactable = false;
-                checkmarkImages[i].enabled = false;
-            }
+            IndicateProgress();
+            UpdateButtons(day);
+            loginDate.SaveLastLoginDate(DateTime.Now);
         }
 
         private void UpdateDailyRewards()
         {
-            DateTime lastLoginDate = GetLastLoginDate();
+            DateTime lastLoginDate = loginDate.GetLastLoginDate();
             DateTime currentDate = DateTime.Now;
 
-            int daysPassed = (int)(currentDate - lastLoginDate).TotalDays;
+            DisableButtons();
+            daysPassed = 2;
+            IndicateProgress();
+            CheckOrExecuteSunday();
+            UpdateButtons(daysPassed);
+        }
 
+        private void IndicateProgress()
+        {
+            int rewardCount = reward.GetTakenRewardCount();
+            progressIndicator.Indicate(rewardCount);
+        }
+
+        private void CheckOrExecuteSunday()
+        {
             if (daysPassed >= maxDays)
-                ResetDailyRewards();
-            else
             {
-                for (int i = 0; i <= daysPassed; i++)
-                {
-                    bool isRewardTaken = PlayerPrefs.GetInt(reward.GetTakenRewardKey(i), 0) == 1;
-
-                    dayButtons[i].interactable = !isRewardTaken;
-                    checkmarkImages[i].enabled = isRewardTaken;
-                }
+                ExecuteSundayReward();
+                daysPassed = 0;
             }
-
-            SaveLastLoginDate(currentDate);
         }
 
-        private DateTime GetLastLoginDate()
+        private void ExecuteSundayReward()
         {
-            if (PlayerPrefs.HasKey(LastLoginDate))
-            {
-                long ticks = Convert.ToInt64(PlayerPrefs.GetString(LastLoginDate));
-                return new DateTime(ticks);
-            }
-
-            return DateTime.Now;
+            ResetDailyRewards();
+            reward.TakeReward(maxDays);
+            sundayReward.Reward();
         }
 
-        private void SaveLastLoginDate(DateTime date)
+        private void ResetDailyRewards()
         {
-            PlayerPrefs.SetString(LastLoginDate, date.Ticks.ToString());
-            PlayerPrefs.Save();
+            for (int i = 0; i < maxDays; i++)
+                PlayerPrefs.SetInt(reward.GetTakenRewardKey(i), 0);
         }
+
+        private void UpdateButtons(int day) => rewardUI.UpdateButtons(day);
+        private void DisableButtons() => rewardUI.DisableButtons();
     }
 }

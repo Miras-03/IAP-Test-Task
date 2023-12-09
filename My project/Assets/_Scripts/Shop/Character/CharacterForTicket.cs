@@ -1,3 +1,4 @@
+using LevelSpace;
 using TicketSpace;
 using TMPro;
 using UnityEngine;
@@ -6,7 +7,7 @@ using Zenject;
 
 namespace Shop.Character
 {
-    public sealed class CharacterShopButton : MonoBehaviour
+    public sealed class CharacterForTicket : MonoBehaviour
     {
         [SerializeField] private CharacterShopSystem shopSystem;
         [SerializeField] private CharacterData characterData;
@@ -27,20 +28,23 @@ namespace Shop.Character
 
         private Ticket ticket;
         private TicketShow ticketShow;
+        private Level level;
 
         private int currentLevel;
         private bool isCharacterBought;
         private bool isThereSelectedButton;
 
-        private const string CurrentLevel = nameof(CurrentLevel);
         private const string LastSelectedCharacter = nameof(LastSelectedCharacter);
 
         [Inject]
-        public void Construct(Ticket ticket, TicketShow ticketShow)
+        public void Construct(Ticket ticket, TicketShow ticketShow, Level level)
         {
             this.ticket = ticket;
             this.ticketShow = ticketShow;
+            this.level = level;
         }
+
+        private void Start() => levelText.text = $"LV.{characterData.requiredLevel}";
 
         private void OnEnable() => buyButton.onClick.AddListener(OnBuyButtonClick);
 
@@ -71,7 +75,7 @@ namespace Shop.Character
         {
             isCharacterBought = PlayerPrefs.GetInt($"Is_{characterData.buttonId}_CharacterBought", 0) == 1;
             isThereSelectedButton = PlayerPrefs.GetInt(LastSelectedCharacter, 0) == characterData.buttonId;
-            currentLevel = PlayerPrefs.GetInt(CurrentLevel);
+            currentLevel = level.CurrentLevel;
         }
 
         private void SetButtonColor(bool canBuy) => 
